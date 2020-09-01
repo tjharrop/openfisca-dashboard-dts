@@ -17,6 +17,7 @@ trace_generate = function(all_request_data) {
             } else {
                 result["trace"][jitem]["count"] = 1;
                 console.log("add " + jitem);
+                // TODO - the score here is wrong and needs to include a multiplication of it's own dependencies (i.e. id 4 things depend on 'age' and 'age' depends on 'birth' birth should have a score of 4, not 1)
             }
           }
         });
