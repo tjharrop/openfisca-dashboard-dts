@@ -78,7 +78,7 @@ $('#clearCalcs').click(function(){
 $('#createForm').click(function(){
   var request_data_structure = {
       "persons": {
-         "Person1":{}
+         "person1":{}
       }
   }
   var query_month = "2020-09";
