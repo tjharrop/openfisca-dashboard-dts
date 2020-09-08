@@ -23,11 +23,51 @@ trace_generate = function(all_request_data) {
         });
       });
       $.each(result["trace"], function(i, item) {
-        var dependenciesList = '';
-        $.each(item['dependencies'], function(i, item) {
-          dependenciesList += '<li>' + item + '</li>';
+        $.each(item['dependencies'], function(xi, xitem) {
+          //add count of the main record of fitem (age) to score of each dependency (birth)
+          if(result["trace"][i]["count"]) {
+              //this variable (age) has a count
+              if(result["trace"][xitem]["score"]) {
+                result["trace"][xitem]["score"] += result["trace"][i]["count"];
+                console.log("add " + i + " score to " + xitem);
+              } else {
+                result["trace"][xitem]["score"] = result["trace"][i]["count"];
+                console.log(xitem + " doesn't have a score, start with " + result["trace"][i]["count"] + " (the score of " + i + ")")
+              }
+
+          } else {
+            if(result["trace"][xitem]["score"]) {
+              result["trace"][xitem]["score"] ++;
+              console.log("add 1 score to " + xitem + " (for use in " + i + ")");
+            } else {
+              result["trace"][xitem]["score"] = 1;
+              console.log(xitem + " doesn't have a score, start with 1 (for use in " + i + ")")
+            }
+
+          }
         });
-        addRow = '<tr><td>' + i + '</td><td>' + item['count'] + '</td><td>' + dependenciesList + '</td></tr>';
+      });
+      $.each(result["trace"], function(i, item) {
+        var dependenciesList = '';
+        $.each(item['dependencies'], function(fi, fitem) {
+          dependenciesList += '<li>' + fitem + '</li>';
+        });
+        var asked;
+        if(!item['count']){
+            item['count'] = 0;
+        }
+        if(!item['score']){
+            item['score'] = 0;
+        }
+        if(item['value']!="false" && item['value']!="unknown"){
+          asked = "(asked)";
+        } else {
+          asked = "(required)"
+        }
+        console.log(i + "value is " + item['value'])
+        console.log(JSON.stringify(item, null, '\t'))
+
+        addRow = '<tr id="row_' + i + '"><td>' + i + '</td><td>' + item['count'] + ' (' + item['score'] + ') ' + asked + '</td><td>' + dependenciesList + '</td></tr>';
         $('#fullSet tbody').append(addRow);
       });
       $('#fullSet').tablesort()
