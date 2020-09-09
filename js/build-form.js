@@ -60,14 +60,14 @@ trace_generate = function(all_request_data) {
             item['score'] = 0;
         }
         if(item['value']!="false" && item['value']!="unknown"){
-          asked = "(asked)";
+          asked = item['value'];
         } else {
-          asked = "(required)"
+          asked = "N/A"
         }
         console.log(i + "value is " + item['value'])
         console.log(JSON.stringify(item, null, '\t'))
 
-        addRow = '<tr id="row_' + i + '"><td>' + i + '</td><td>' + item['count'] + ' (' + item['score'] + ') ' + asked + '</td><td>' + dependenciesList + '</td></tr>';
+        addRow = '<tr id="row_' + i + '"><td>' + i + '</td><td>' + item['count'] + '</td><td>' + item['score'] + '</td><td>' + asked + '</td><td>' + dependenciesList + '</td></tr>';
         $('#fullSet tbody').append(addRow);
       });
       $('#fullSet').tablesort()
