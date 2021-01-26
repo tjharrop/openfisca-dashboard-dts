@@ -1,2 +1,2 @@
 # Openfisca DTS Dashboard
-OpenFisca question and answer machine
+A way to view openfisca via a browser
