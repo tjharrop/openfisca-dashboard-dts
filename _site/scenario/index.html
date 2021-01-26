@@ -14,6 +14,8 @@
   <script src="/assets/semantic.min.js"></script>
   <script src="/assets/js/tablesort.js"></script>
   <script src="/assets/js/global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/components/calendar.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/components/calendar.min.css">
 
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/se/dt-1.10.23/datatables.min.css"/>
   <script type="text/javascript" src="https://cdn.datatables.net/v/se/dt-1.10.23/datatables.min.js"></script>
@@ -81,6 +83,9 @@
           <a class="menu__link" href="/entities/">Entities</a>
         </li>
         <li class="menu__item">
+          <a class="menu__link" href="/scenario/">Test a scenario</a>
+        </li>
+        <li class="menu__item">
           <a class="menu__link" href="/settings/">Settings</a>
         </li>
       </ul>
@@ -97,7 +102,16 @@
       </div>
       <div class="content">
         <div class="ui form">
-
+          <div class="fields">
+            <div class="field">
+              <div class="ui calendar" id="calcDate">
+                <div class="ui input left icon">
+                  <i class="calendar icon"></i>
+                  <input type="text" placeholder="Date">
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="field">
             <div class="ui action input">
               <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
@@ -152,12 +166,34 @@
       </div>
     </div>
 </div>
+<pre id="scenarioForm">
+</pre>
   <script src="/assets/js/scenario.js"></script>
   <script type="text/javascript">
   $('.ui.accordion')
     .accordion()
   ;
   $('#populateCalcs').click();
+
+  $('#calcDate').calendar({
+  type: 'date',
+  popupOptions: {
+    position: 'bottom right',
+    lastResort: 'bottom right',
+    prefer: 'opposite',
+    hideOnScroll: false
+  },
+  formatter: {
+  date: function (date, settings) {
+    if (!date) return '';
+    window.calc_day = date.getDate();
+    window.calc_month = date.getMonth() + 1;
+    window.calc_year = date.getFullYear();
+    window.calc_date = window.calc_year + "-" + window.calc_month + "-" + window.calc_day;
+    return window.calc_date;
+    }
+  }
+  });
   </script>
 
       </div>

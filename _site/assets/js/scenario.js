@@ -1,3 +1,9 @@
+var date = new Date();
+window.calc_day = date.getDate();
+window.calc_month = date.getMonth() + 1;
+window.calc_year = date.getFullYear();
+window.calc_date = window.calc_year + "-" + window.calc_month + "-" + window.calc_day;
+
 $('#populateCalcs').click(function(){
   apiurl = window.OFURL;
   if($('#selectCalcs').length){
@@ -8,13 +14,8 @@ $('#populateCalcs').click(function(){
       contentType: 'application/json',
       success: function(result){
 
-        $('.ui.dropdown')
-          .dropdown()
-        ;
-
-        $('.ui.dropdown')
-          .dropdown('clear')
-        ;
+        $('.ui.dropdown').dropdown();
+        $('.ui.dropdown').dropdown('clear');
 
         $.each(result, function(i, item) {
             $("#selectCalcs .menu").prepend(
@@ -22,42 +23,91 @@ $('#populateCalcs').click(function(){
             );
         });
 
-        $('.ui.accordion')
-          .accordion('open', 0)
-        ;
+        $('.ui.accordion').accordion('open', 0);
+
       }
     });
   }
 });
 
 $('#clearCalcs').click(function(){
-  $('.ui.dropdown')
-    .dropdown('clear')
-  ;
+  $('.ui.dropdown').dropdown('clear');
 });
 
 function getFullVar(varName){
 }
 
 $('#createForm').click(function(){
+  //get the calcs from the form and array them
   var calcs = $("input[name='calculations']").val();
   var calc_array = calcs.split(',');
-  for(var i = 0; i < calc_array.length; i++) {
-    $.ajax({
-      url: window.OFURL + "variable/" + calc_array[i],
-      method: 'GET',
-      contentType: 'application/json',
-      success: function(result){
-        $("scenarioForm").append(
-          JSON.stringify(result) + ", "
-        );
-        return result;
+  //generate object structure based on entities
+  var trace_data_structure = new Object();
+  var plural_glossary = new Object(); //also create a glossary of plurals to save API calls
+  $.ajax({
+    url: window.OFURL + "entities",
+    method: 'GET',
+    contentType: 'application/json',
+    success: function(result){
+
+      $.each(result, function(i, item) {
+        plural = item['plural'];
+        single = i;
+        trace_data_structure[plural] = {};
+        trace_data_structure[plural][single] = {};
+        plural_glossary[single] = plural; // this helps where variables list the singular but the obj needs the plural
+      });
+    },
+    complete: function(result){
+      //Object setup complete, now populate
+      //loop the users array and add the variables to the correct entities. They're empty inside.
+      for(var i = 0; i < calc_array.length; i++) {
+        $.ajax({
+          url: window.OFURL + "variable/" + calc_array[i],
+          method: 'GET',
+          contentType: 'application/json',
+          success: function(result){
+            var single_entity = result["entity"];
+            var plural_entity = plural_glossary[single_entity];
+            var calcVar = result["id"];
+            var traceDate;
+            switch (result["definitionPeriod"])
+              {
+                 case "DAY":
+                 case "ETERNITY":
+                     traceDate = window.calc_date
+                     break;
+
+                 case "MONTH":
+                     traceDate = window.calc_year + "-" + window.calc_month
+                     break;
+
+                 case "YEAR":
+                     traceDate = window.calc_year
+                     break;
+
+                 default:
+                 traceDate = window.calc_date
+              };
+              trace_data_structure[plural_entity][single_entity][calcVar] = {};
+              trace_data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
+              $("#scenarioForm").html(
+                JSON.stringify(trace_data_structure,null,'\t')
+              );
+          }
+        });
       }
-    });
-    //thisOne = getFullVar(calc_array[i]);
-  }
+    }
+  }).then(function() {
+  });
 });
 
+//
+//
+//
+//
+//
+//
 
 $('#createFormewew').click(function(){
   //generate object structure based on entities

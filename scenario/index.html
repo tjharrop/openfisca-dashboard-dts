@@ -10,7 +10,16 @@ title: Test a scenario
       </div>
       <div class="content">
         <div class="ui form">
-
+          <div class="fields">
+            <div class="field">
+              <div class="ui calendar" id="calcDate">
+                <div class="ui input left icon">
+                  <i class="calendar icon"></i>
+                  <input type="text" placeholder="Date">
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="field">
             <div class="ui action input">
               <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
@@ -65,10 +74,32 @@ title: Test a scenario
       </div>
     </div>
 </div>
+<pre id="scenarioForm">
+</pre>
   <script src="/assets/js/scenario.js"></script>
   <script type="text/javascript">
   $('.ui.accordion')
     .accordion()
   ;
   $('#populateCalcs').click();
+
+  $('#calcDate').calendar({
+  type: 'date',
+  popupOptions: {
+    position: 'bottom right',
+    lastResort: 'bottom right',
+    prefer: 'opposite',
+    hideOnScroll: false
+  },
+  formatter: {
+  date: function (date, settings) {
+    if (!date) return '';
+    window.calc_day = date.getDate();
+    window.calc_month = date.getMonth() + 1;
+    window.calc_year = date.getFullYear();
+    window.calc_date = window.calc_year + "-" + window.calc_month + "-" + window.calc_day;
+    return window.calc_date;
+    }
+  }
+  });
   </script>
