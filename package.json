@@ -1,19 +1,30 @@
 {
-  "name": "static-heroku-nodejs",
-  "version": "0.0.0",
-  "description": "static-heroku-nodejs",
+  "name": "of-dash-nodejs",
+  "version": "0.1.0",
+  "description": "of-dash-nodejs",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node app.js",
+    "start": "npm-run-all --parallel browser-sync build-sass watch-sass",
+    "sass": "build-sass watch-sass",
+    "browser-sync": "browser-sync start --server --files '**/*.css, **/*.html, **/*.js, !node_modules/**/*' -w --directory --port 7777 --browser \"C:\\Program Files\\Firefox Developer Edition\\firefox.exe\"",
+    "build-sass": "node-sass of-dash.scss of-dash.css",
+    "watch-sass": "node-sass -w of-dash.scss of-dash.css"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.14",
+    "node-sass": "^5.0.0",
+    "npm-run-all": "^4.1.5"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Yankovsky/static-heroku-nodejs.git"
+    "url": "git://github.com/DTS-STN/openfisca-dashboard-dts"
   },
-  "author": "",
+  "author": "tjharrop",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Yankovsky/static-heroku-nodejs/issues"
+    "url": "https://github.com/DTS-STN/openfisca-dashboard-dts/issues"
   },
-  "homepage": "https://github.com/Yankovsky/static-heroku-nodejs"
+  "homepage": "https://github.com/DTS-STN/openfisca-dashboard-dts"
 }
