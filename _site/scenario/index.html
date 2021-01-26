@@ -81,18 +81,12 @@
           <a class="menu__link" href="/entities/">Entities</a>
         </li>
         <li class="menu__item">
-          <a class="menu__link" href="/scenario/">Test a scenario</a>
-        </li>
-        <li class="menu__item">
-          <a class="menu__link" href="/bulk/">Bulk test</a>
-        </li>
-        <li class="menu__item">
           <a class="menu__link" href="/settings/">Settings</a>
         </li>
       </ul>
     </nav>
     <main class="admin__main">
-      <h2 id="pageTitle"></h2>
+      <h2 id="pageTitle">Test a scenario</h2>
       <div class="">
         <div class="dashboard__item dashboard__item--full">
   <div id="populateCalcs"></div>
@@ -103,19 +97,20 @@
       </div>
       <div class="content">
         <div class="ui form">
+
           <div class="field">
-            <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
-              <input type="hidden" name="calculations">
-              <i class="dropdown icon"></i>
-              <div class="default text">Select Calculations</div>
-              <div class="menu">
+            <div class="ui action input">
+              <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
+                <input type="hidden" name="calculations">
+                <i class="dropdown icon"></i>
+                <div class="default text">Select Calculations</div>
+                <div class="menu">
+                </div>
               </div>
+              <button class="ui primary button" id="createForm">Get inputs</button>
             </div>
           </div>
           <div class="field">
-            <button class="ui primary button" id="createForm">
-              Get inputs
-            </button>
             <button class="ui button" id="clearCalcs">
               Clear
             </button>

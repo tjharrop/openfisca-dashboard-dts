@@ -4,7 +4,9 @@ const fs = require('fs')
 const port = process.env.PORT || 3000
 
 http.createServer((req, res) => {
-  const filePath = __dirname + (req.url === '/' ? '/index.html' : req.url)
+  var fileReqPath = __dirname + "/_site" + (req.url === '/' ? '/index.html' : req.url.split("?")[0]);
+  if (fs.statSync(fileReqPath).isDirectory()) fileReqPath += '/index.html';
+  const filePath = fileReqPath;
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.writeHead(404)

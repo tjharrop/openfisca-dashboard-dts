@@ -1,88 +1,3 @@
-$('#populateCalcs').click(function(){
-  apiurl = window.OFURL;
-  if($('#selectCalcs').length){
-    $('#selectCalcs .menu').empty();
-    $.ajax({
-      url: apiurl + "variables",
-      method: 'GET',
-      contentType: 'application/json',
-      success: function(result){
-
-        $('.ui.dropdown')
-          .dropdown()
-        ;
-
-        $('.ui.dropdown')
-          .dropdown('clear')
-        ;
-
-        $.each(result, function(i, item) {
-            $("#selectCalcs .menu").prepend(
-              '<div class="item" data-value="' + i + '">' + i + '</div>'
-            );
-        });
-
-        $('.ui.accordion')
-          .accordion('open', 0)
-        ;
-      }
-    });
-  }
-});
-
-$('#clearCalcs').click(function(){
-  $('.ui.dropdown')
-    .dropdown('clear')
-  ;
-});
-
-function getFullVar(varName){
-}
-
-$('#createForm').click(function(){
-  var calcs = $("input[name='calculations']").val();
-  var calc_array = calcs.split(',');
-  for(var i = 0; i < calc_array.length; i++) {
-    $.ajax({
-      url: window.OFURL + "variable/" + calc_array[i],
-      method: 'GET',
-      contentType: 'application/json',
-      success: function(result){
-        $("scenarioForm").append(
-          JSON.stringify(result) + ", "
-        );
-        return result;
-      }
-    });
-    //thisOne = getFullVar(calc_array[i]);
-  }
-});
-
-
-$('#createFormewew').click(function(){
-  //generate object structure based on entities
-  var request_data_structure = {
-      "persons": {
-         "person1":{}
-      }
-  }
-  var query_month = "2020-09";
-  var calcs = $("input[name='calculations']").val();
-  var calc_array = calcs.split(',');
-  var data_location = request_data_structure.persons.person1;
-  for(var i = 0; i < calc_array.length; i++) {
-    thisOne = calc_array[i];
-    data_location[thisOne] = {[query_month]: null};
-  }
-  console.log(JSON.stringify(request_data_structure, null, '\t'))
-  trace_generate(request_data_structure);
-
-
-});
-
-
-
-
 trace_generate = function(all_request_data) {
   apiurl = window.OFURL;
   $.ajax({
@@ -161,3 +76,61 @@ trace_generate = function(all_request_data) {
       ;
   }});
 }
+
+$('#populateCalcs').click(function(){
+  apiurl = window.OFURL;
+  if($('#selectCalcs').length){
+    $('#selectCalcs .menu').empty();
+    $.ajax({
+      url: apiurl + "variables",
+      method: 'GET',
+      contentType: 'application/json',
+      success: function(result){
+
+        $('.ui.dropdown')
+          .dropdown()
+        ;
+
+        $('.ui.dropdown')
+          .dropdown('clear')
+        ;
+
+        $.each(result, function(i, item) {
+            $("#selectCalcs .menu").prepend(
+              '<div class="item" data-value="' + i + '">' + i + '</div>'
+            );
+        });
+
+        $('.ui.accordion')
+          .accordion('open', 0)
+        ;
+      }
+    });
+  }
+});
+
+$('#clearCalcs').click(function(){
+  $('.ui.dropdown')
+    .dropdown('clear')
+  ;
+});
+
+$('#createForm').click(function(){
+  var request_data_structure = {
+      "persons": {
+         "person1":{}
+      }
+  }
+  var query_month = "2020-09";
+  var calcs = $("input[name='calculations']").val();
+  var calc_array = calcs.split(',');
+  var data_location = request_data_structure.persons.person1;
+  for(var i = 0; i < calc_array.length; i++) {
+    thisOne = calc_array[i];
+    data_location[thisOne] = {[query_month]: null};
+  }
+  console.log(JSON.stringify(request_data_structure, null, '\t'))
+  trace_generate(request_data_structure);
+
+
+});

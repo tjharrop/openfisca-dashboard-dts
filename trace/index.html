@@ -1,6 +1,3 @@
----
-title: Test a scenario
----
 <div class="dashboard__item dashboard__item--full">
   <div id="populateCalcs"></div>
     <div class="ui styled fluid accordion">
@@ -10,20 +7,19 @@ title: Test a scenario
       </div>
       <div class="content">
         <div class="ui form">
-
           <div class="field">
-            <div class="ui action input">
-              <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
-                <input type="hidden" name="calculations">
-                <i class="dropdown icon"></i>
-                <div class="default text">Select Calculations</div>
-                <div class="menu">
-                </div>
+            <div class="ui fluid search selection dropdown multiple" id="selectCalcs">
+              <input type="hidden" name="calculations">
+              <i class="dropdown icon"></i>
+              <div class="default text">Select Calculations</div>
+              <div class="menu">
               </div>
-              <button class="ui primary button" id="createForm">Get inputs</button>
             </div>
           </div>
           <div class="field">
+            <button class="ui primary button" id="createForm">
+              Get inputs
+            </button>
             <button class="ui button" id="clearCalcs">
               Clear
             </button>
@@ -49,23 +45,8 @@ title: Test a scenario
           </tbody>
         </table>
       </div>
-      <div class="title">
-        <i class="dropdown icon"></i>
-        Enter data
-      </div>
-      <div class="content">
-        <p>This will be a form with a data entry for each dependency which has no further dependencies, prioritised by score.</p>
-      </div>
-      <div class="title">
-        <i class="dropdown icon"></i>
-        Get results
-      </div>
-      <div class="content">
-        <p>This will be a return of /trace run from the form in the previous step with a result for each calculation from step 2, and a breakdown of the value of each of it's dependencies.</p>
-      </div>
-    </div>
 </div>
-  <script src="/assets/js/scenario.js"></script>
+  <script src="/assets/js/trace.js"></script>
   <script type="text/javascript">
   $('.ui.accordion')
     .accordion()
