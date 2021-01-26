@@ -4,11 +4,7 @@
   "description": "of-dash-nodejs",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm-run-all --parallel browser-sync build-sass watch-sass",
-    "browser-sync": "browser-sync start --server --files '**/*.css, **/*.html, **/*.js, !node_modules/**/*' -w --directory --port 7777 --browser \"C:\\Program Files\\Firefox Developer Edition\\firefox.exe\"",
-    "build-sass": "node-sass of-dash.scss of-dash.css",
-    "watch-sass": "node-sass -w _site/assets/of-dash.scss _site/assets/of-dash.css"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@11ty/eleventy": "^0.11.1",
