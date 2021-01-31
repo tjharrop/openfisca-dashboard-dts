@@ -1,1 +1,1 @@
-web: http-server _site/
+web: http-server docs/ -p $PORT
