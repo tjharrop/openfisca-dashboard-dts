@@ -89,7 +89,6 @@ function getDeps(depInputData, callback){
   });
 }
 
-
 function getPlurals(callback){
   var glossary = new Object();
   $.ajax({
