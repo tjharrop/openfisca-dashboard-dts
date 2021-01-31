@@ -5,6 +5,7 @@ window.calc_year = date.getFullYear();
 window.calc_date = window.calc_year + "-" + window.calc_month + "-" + window.calc_day;
 
 var plural_glossary = new Object();
+var data_structure = new Object();
 
 getPlurals(function (data) {
   $.each(data, function(i, item) {
@@ -36,26 +37,58 @@ $(document).ready(function() {
     //get the calcs from the form and array them
     var calcs = $("input[name='calculations']").val();
     var calc_array = calcs.split(',');
-    createPayload(calc_array);
-    console.log(calc_array);
+    createPayload(
+      calc_array,
+      function(data){
+        console.log("data going in to deps:");
+        console.log(data);
+        getDeps(data, function(depInput){
+          createPayload( //create payload from deps to generate form
+            Object.keys(depInput),
+            function(data){
+              console.log(data);
+              //formSchema(data); // Turn the openfisca payload into a form
+            }
+          )
+        }); // Send payload to /deps and get new list
+      }
+    );
   });
 
 });
 
-const inputModel = {
-    "birth": 17,
-    "is_nsw_resident": 4,
-    "is_enrolled_in_school": 4,
-    "active_kids__already_issued_in_calendar_year": 4,
-    "has_valid_medicare_card": 4,
-    "paintball_marker_permit_person_has_completed_training": 1,
-    "is_parent": 1,
-    "is_guardian": 1,
-    "is_carer": 1,
-    "active_kids__family_has_children_eligible": 1
-};
-var depData = createPayload(Object.keys(inputModel)); // Turn the list into an openfisca payload
-formSchema(depData); // Turn the openfisca payload into a form
+// const inputModel = {
+//     "birth": 17,
+//     "is_nsw_resident": 4,
+//     "is_enrolled_in_school": 4,
+//     "active_kids__already_issued_in_calendar_year": 4,
+//     "has_valid_medicare_card": 4,
+//     "paintball_marker_permit_person_has_completed_training": 1,
+//     "is_parent": 1,
+//     "is_guardian": 1,
+//     "is_carer": 1,
+//     "active_kids__family_has_children_eligible": 1
+// };
+// var depData = createPayload(
+//   Object.keys(inputModel),
+//   function(data){
+//     console.log(data);
+//     formSchema(depData); // Turn the openfisca payload into a form
+//   }
+// );
+
+function getDeps(depInputData, callback){
+  console.log("Data inside deps");
+  console.log(depInputData);
+  $.ajax({
+    url: window.OFURL + "dependencies",
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(depInputData),
+    success: callback
+  });
+}
+
 
 function getPlurals(callback){
   var glossary = new Object();
@@ -76,49 +109,56 @@ function getVariables(callback){
   });
 }
 
-function createPayload(inputArr) {
+function createPayload(inputArr, callback) {
+  var payload_calls = [];
+  data_structure = {}
   for (var key in inputArr) {
-    var data_structure = new Object();
-    $.ajax({
-      url: window.OFURL + "variable/" + inputArr[key],
-      method: 'GET',
-      contentType: 'application/json',
-      success: function(result){
-        var single_entity = result["entity"];
-        var plural_entity = plural_glossary[single_entity];
-        var calcVar = result["id"];
-        var traceDate;
-        switch (result["definitionPeriod"])
-          {
-             case "DAY":
-             case "ETERNITY":
-                 traceDate = window.calc_date
-                 break;
-
-             case "MONTH":
-                 traceDate = window.calc_year + "-" + window.calc_month
-                 break;
-
-             case "YEAR":
-                 traceDate = window.calc_year
-                 break;
-
-             default:
-             traceDate = window.calc_date
-          };
-          console.log("retrieved var " + calcVar);
-          single_entity = single_entity + "1";
-          data_structure[plural_entity] = data_structure[plural_entity] || {};
-          data_structure[plural_entity][single_entity] = data_structure[plural_entity][single_entity] || {};
-          data_structure[plural_entity][single_entity][calcVar] = data_structure[plural_entity][single_entity][calcVar] || {};
-          data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
-          $("#scenarioForm").html(
-            JSON.stringify(data_structure,null,'\t')
-          );
-          return data_structure;
-      }
-    });
+    payload_calls.push(
+      $.ajax({
+        url: window.OFURL + "variable/" + inputArr[key],
+        method: 'GET',
+        contentType: 'application/json',
+        success: function(data){
+          payloadAddVar(data);
+        }
+      })
+    );
   }
+  Promise.all(payload_calls).then(callback(data_structure));
+}
+
+function payloadAddVar(result) {
+  var single_entity = result["entity"];
+  var plural_entity = plural_glossary[single_entity];
+  var calcVar = result["id"];
+  var traceDate;
+  switch (result["definitionPeriod"])
+    {
+       case "DAY":
+       case "ETERNITY":
+           traceDate = window.calc_date
+           break;
+
+       case "MONTH":
+           traceDate = window.calc_year + "-" + window.calc_month
+           break;
+
+       case "YEAR":
+           traceDate = window.calc_year
+           break;
+
+       default:
+       traceDate = window.calc_date
+    };
+    single_entity = single_entity + "1";
+    data_structure[plural_entity] = data_structure[plural_entity] || {};
+    data_structure[plural_entity][single_entity] = data_structure[plural_entity][single_entity] || {};
+    data_structure[plural_entity][single_entity][calcVar] = data_structure[plural_entity][single_entity][calcVar] || {};
+    data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
+    $("#scenarioForm").html(
+      JSON.stringify(data_structure,null,'\t')
+    );
+
 }
 
 function formSchema(inputObj) {
