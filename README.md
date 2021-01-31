@@ -12,7 +12,9 @@ Openfisca explorer is compiled into a static site. Check in the gh-pages branch 
 
 To run it locally:
 1. Clone this repository
-2. npm run dev
+2. Open terminal at the cloned repo
+3. npm install
+4. npm run dev
 
 ## Running on heroku from github
 
