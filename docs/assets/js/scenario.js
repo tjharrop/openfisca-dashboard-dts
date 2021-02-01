@@ -33,58 +33,43 @@ $(document).ready(function() {
     $('.ui.dropdown').dropdown('clear');
   });
 
+  window.payload_calls = [];
+
   $('#createForm').click(function(){
     //get the calcs from the form and array them
+    applog("1. Create form for:",$("input[name='calculations']").val());
     var calcs = $("input[name='calculations']").val();
     var calc_array = calcs.split(',');
     createPayload(
       calc_array,
       function(data){
-        console.log("data going in to deps:");
-        console.log(data);
-        getDeps(data, function(depInput){
-          createPayload( //create payload from deps to generate form
-            Object.keys(depInput),
-            function(data){
-              console.log(data);
-              //formSchema(data); // Turn the openfisca payload into a form
-            }
-          )
-        }); // Send payload to /deps and get new list
+            applog("2. Payload based on step 1 variables:",data_structure);
+            getDeps(data_structure, function(depInput){
+              applog("3. Dependencies for that structure:", depInput);
+              applog("4. Format a payload for the keys:",Object.keys(depInput));
+              createPayload( //create payload from deps to generate form
+                Object.keys(depInput),
+                function(formPayload){
+                  applog("5. Payload formed from step 4 keys:", data_structure);
+                  formSchema(data_structure);
+                }
+              )
+            }); // Send payload to /deps and get new list
+
       }
     );
   });
 
 });
 
-// const inputModel = {
-//     "birth": 17,
-//     "is_nsw_resident": 4,
-//     "is_enrolled_in_school": 4,
-//     "active_kids__already_issued_in_calendar_year": 4,
-//     "has_valid_medicare_card": 4,
-//     "paintball_marker_permit_person_has_completed_training": 1,
-//     "is_parent": 1,
-//     "is_guardian": 1,
-//     "is_carer": 1,
-//     "active_kids__family_has_children_eligible": 1
-// };
-// var depData = createPayload(
-//   Object.keys(inputModel),
-//   function(data){
-//     console.log(data);
-//     formSchema(depData); // Turn the openfisca payload into a form
-//   }
-// );
-
 function getDeps(depInputData, callback){
   console.log("Data inside deps");
-  console.log(depInputData);
+  console.log(JSON.stringify(depInputData));
   $.ajax({
     url: window.OFURL + "dependencies",
     method: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(depInputData),
+    data: JSON.stringify(depInputData,null,'\t'),
     success: callback
   });
 }
@@ -109,21 +94,22 @@ function getVariables(callback){
 }
 
 function createPayload(inputArr, callback) {
-  var payload_calls = [];
   data_structure = {}
   for (var key in inputArr) {
-    payload_calls.push(
+    window.payload_calls.push(
       $.ajax({
         url: window.OFURL + "variable/" + inputArr[key],
         method: 'GET',
         contentType: 'application/json',
         success: function(data){
-          payloadAddVar(data);
+          window.payload_calls.push(payloadAddVar(data));
         }
       })
     );
   }
-  Promise.all(payload_calls).then(callback(data_structure));
+  Promise.all(window.payload_calls).then(
+    callback
+  );
 }
 
 function payloadAddVar(result) {
@@ -154,16 +140,27 @@ function payloadAddVar(result) {
     data_structure[plural_entity][single_entity] = data_structure[plural_entity][single_entity] || {};
     data_structure[plural_entity][single_entity][calcVar] = data_structure[plural_entity][single_entity][calcVar] || {};
     data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
-    $("#scenarioForm").html(
-      JSON.stringify(data_structure,null,'\t')
-    );
+    // $("#scenarioForm").html(
+    //   JSON.stringify(data_structure,null,'\t')
+    // );
 
 }
 
 function formSchema(inputObj) {
-  for (entity in inputObj) {
-    console.log(entity);
+  for (entitytype in inputObj) {
+    for (entity in entitytype) {
+      for (formVar in entity) {
+        applog("Add to form:", entitytype + ", " + entity + ", " + formVar);
+      }
+    }
   }
+}
+function applog(title, content){
+  $("#scenarioForm").append(
+    "<h4>" + title + "</h4>" +
+    "<pre>" + JSON.stringify(content) + "</pre>" +
+    "<hr>"
+  );
 }
 
 //
@@ -172,6 +169,28 @@ function formSchema(inputObj) {
 // REMOVE BELOW HERE WHEN REFACTOR IS COMPLETE
 //
 //
+
+// const inputModel = {
+//     "birth": 17,
+//     "is_nsw_resident": 4,
+//     "is_enrolled_in_school": 4,
+//     "active_kids__already_issued_in_calendar_year": 4,
+//     "has_valid_medicare_card": 4,
+//     "paintball_marker_permit_person_has_completed_training": 1,
+//     "is_parent": 1,
+//     "is_guardian": 1,
+//     "is_carer": 1,
+//     "active_kids__family_has_children_eligible": 1
+// };
+// var depData = createPayload(
+//   Object.keys(inputModel),
+//   function(data){
+//     console.log(data);
+//     formSchema(depData); // Turn the openfisca payload into a form
+//   }
+// );
+
+
 
 $('#createFormewew').click(function(){
   //generate object structure based on entities
