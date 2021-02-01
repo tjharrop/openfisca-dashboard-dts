@@ -16,11 +16,12 @@
   <script src="/assets/js/global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/components/calendar.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/components/calendar.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/se/dt-1.10.23/datatables.min.css"/>
   <script type="text/javascript" src="https://cdn.datatables.net/v/se/dt-1.10.23/datatables.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/combine/npm/jsonform@2.2.2,npm/jsonform@2.2.2/deps/underscore.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/combine/npm/jsonform@2.2.2,npm/jsonform@2.2.2/deps/underscore.min.js,npm/jsonpath-plus@5.0.2/dist/index-browser-umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/jsonpath-plus@5.0.2/dist/index-browser-umd.min.js,npm/jsonform@2.2.2,npm/jsonform@2.2.2/deps/underscore.min.js,npm/jsonform@2.2.2/deps/opt/jsv.min.js"></script>
 </head>
 
 <body class="nimbus-is-editor">
@@ -128,8 +129,8 @@
         <i class="dropdown icon"></i>
         Enter data
       </div>
-      <div class="content">
-        <p>This will be a form with a data entry for each dependency which has no further dependencies, prioritised by score.</p>
+      <div class="content" id="formContainer">
+        <p>Please select calculation variables to view the input form.</p>
       </div>
       <div class="title">
         <i class="dropdown icon"></i>

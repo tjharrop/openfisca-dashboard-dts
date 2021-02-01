@@ -3,9 +3,9 @@ window.calc_day = date.getDate();
 window.calc_month = date.getMonth() + 1;
 window.calc_year = date.getFullYear();
 window.calc_date = window.calc_year + "-" + window.calc_month + "-" + window.calc_day;
-
 var plural_glossary = new Object();
 var data_structure = new Object();
+var formSchema = new Object;
 
 getPlurals(function (data) {
   $.each(data, function(i, item) {
@@ -33,9 +33,10 @@ $(document).ready(function() {
     $('.ui.dropdown').dropdown('clear');
   });
 
-  window.payload_calls = [];
-
   $('#createForm').click(function(){
+    window.payload_calls = [];
+    window.formgen_calls = [];
+    data_structure = {};
     //get the calcs from the form and array them
     applog("1. Create form for:",$("input[name='calculations']").val());
     var calcs = $("input[name='calculations']").val();
@@ -51,7 +52,14 @@ $(document).ready(function() {
                 Object.keys(depInput),
                 function(formPayload){
                   applog("5. Payload formed from step 4 keys:", data_structure);
-                  formSchema(data_structure);
+                  createFormSchema(Object.keys(depInput), function(){
+                    applog("6 Add to form:", formSchema);
+                    //(function() {$('#formContainer').jsonForm(completeFormSchema);})()
+                    console.log(formSchema);
+                    applog("formschema going to jsonform is", formSchema);
+                    $('#formContainer').jsonForm(formSchema);
+                    $('.ui.accordion').accordion('open', 2);
+                  });
                 }
               )
             }); // Send payload to /deps and get new list
@@ -94,7 +102,7 @@ function getVariables(callback){
 }
 
 function createPayload(inputArr, callback) {
-  data_structure = {}
+
   for (var key in inputArr) {
     window.payload_calls.push(
       $.ajax({
@@ -116,8 +124,79 @@ function payloadAddVar(result) {
   var single_entity = result["entity"];
   var plural_entity = plural_glossary[single_entity];
   var calcVar = result["id"];
-  var traceDate;
-  switch (result["definitionPeriod"])
+  var traceDate = formatDate(result["definitionPeriod"]);
+    single_entity = single_entity + " 1";
+    data_structure[plural_entity] = data_structure[plural_entity] || {};
+    data_structure[plural_entity][single_entity] = data_structure[plural_entity][single_entity] || {};
+    data_structure[plural_entity][single_entity][calcVar] = data_structure[plural_entity][single_entity][calcVar] || {};
+    data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
+}
+
+function createFormSchema(questions, callback) {
+  formSchema = {};
+  for (var key in questions) {
+    window.formgen_calls.push(
+      $.ajax({
+        url: window.OFURL + "variable/" + questions[key],
+        method: 'GET',
+        contentType: 'application/json',
+        success: function(data){
+          window.formgen_calls.push(
+            addField(data)
+          );
+        }
+      })
+    );
+  }
+  Promise.all(window.formgen_calls).then(
+    callback
+  );
+}
+
+function addField(result){
+    var single_entity = result["entity"];
+    var plural_entity = plural_glossary[single_entity];
+    var id = result["id"];
+    var date = formatDate(result["definitionPeriod"]);
+    var type = result["valueType"];
+    var pathSelector = "$." + plural_entity + ".*~." + result["id"];
+    var specific_entity = JSONPath.JSONPath({path: pathSelector, json: data_structure});
+    formSchema["schema"] = formSchema["schema"] || {};
+    formSchema["schema"][id] = formSchema["schema"][id] || {
+      "type": "object",
+      "title": id,
+      "properties":{
+        "value":{
+          "title": "Value",
+          "description": result["description"],
+          "type": "string",
+          "default": result["defaultValue"]
+        },
+        "date":{
+          "title": "Date",
+          "description": "Formatted as " + dateDescriptor(result["definitionPeriod"]),
+          "type": "string",
+          "default": date
+        },
+        "entity":{
+          "title": single_entity,
+          "type": "string",
+          "default": specific_entity
+        },
+      }
+    };
+}
+
+function applog(title, content){
+  $("#scenarioForm").append(
+    "<h4>" + title + "</h4>" +
+    "<pre>" + JSON.stringify(content) + "</pre>" +
+    "<hr>"
+  );
+}
+
+function formatDate(type){
+  switch (type)
     {
        case "DAY":
        case "ETERNITY":
@@ -134,34 +213,32 @@ function payloadAddVar(result) {
 
        default:
        traceDate = window.calc_date
-    };
-    single_entity = single_entity + "1";
-    data_structure[plural_entity] = data_structure[plural_entity] || {};
-    data_structure[plural_entity][single_entity] = data_structure[plural_entity][single_entity] || {};
-    data_structure[plural_entity][single_entity][calcVar] = data_structure[plural_entity][single_entity][calcVar] || {};
-    data_structure[plural_entity][single_entity][calcVar][traceDate] = null;
-    // $("#scenarioForm").html(
-    //   JSON.stringify(data_structure,null,'\t')
-    // );
-
-}
-
-function formSchema(inputObj) {
-  for (entitytype in inputObj) {
-    for (entity in entitytype) {
-      for (formVar in entity) {
-        applog("Add to form:", entitytype + ", " + entity + ", " + formVar);
-      }
     }
-  }
+    return traceDate;
 }
-function applog(title, content){
-  $("#scenarioForm").append(
-    "<h4>" + title + "</h4>" +
-    "<pre>" + JSON.stringify(content) + "</pre>" +
-    "<hr>"
-  );
+
+function dateDescriptor(type){
+  switch (type)
+    {
+       case "DAY":
+       case "ETERNITY":
+           dateHelper = "YYYY-MM-DD"
+           break;
+
+       case "MONTH":
+           dateHelper = "YYYY-MM"
+           break;
+
+       case "YEAR":
+           dateHelper = "YYYY"
+           break;
+
+       default:
+       dateHelper = "YYYY-MM-DD"
+    }
+    return dateHelper;
 }
+
 
 //
 //

@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "cleanbuild": "rm -rf docs/ && npm-run-all --parallel build:**",
     "build": "npm-run-all --parallel build:**",
     "build:11ty": "eleventy",
     "build:buildcss": "node-sass _src/assets/*.scss -o docs/assets/",
