@@ -41,11 +41,11 @@ $(document).ready(function() {
       // var specific_entity = JSONPath.JSONPath({path: pathSelector, json: data_structure});
       var specific_entity = single_entity + " 1";
       //single_entity = $("input[name='" + id + ".entity']").val();
-      inputDate = $("input[name='" + id + ".date']").val();
-      inputVal = $("input[name='" + id + ".value']").val();
+      inputDate = $("[name='" + id + ".date']").val();
+      inputVal = $("[name='" + id + ".value']").val();
       // Check if still the same entity
       if(specific_entity){
-        delete calculate_structure[plural_entity][specific_entity][id][0]
+        calculate_structure[plural_entity][specific_entity][id] = {};
         data_structure[plural_entity][specific_entity][id][inputDate] = inputVal;
       } else {
         console.log(id + " entity was [" + specific_entity + "] now [" + single_entity + "]");
@@ -56,7 +56,7 @@ $(document).ready(function() {
       }
     }
     applog("7. /calculate payload with form data", calculate_structure);
-    $('#resultSet tbody').html();
+    $('#resultSet tbody').html("");
     getCalc(calculate_structure,function(results){
       applog("8. Display results", results);
       $.each(calc_array, function(i, item){
@@ -100,7 +100,7 @@ $(document).ready(function() {
                   createFormSchema(Object.keys(depInput), function(){
                     applog("6. Add to form:", formSchema);
                     //(function() {$('#formContainer').jsonForm(completeFormSchema);})()
-                    $('#formContainer').html();
+                    $('#formContainer').html("");
                     $('#formContainer').jsonForm(formSchema);
                     $('.ui.accordion').accordion('open', 2);
                   });
@@ -266,6 +266,9 @@ function addField(result){
     if (type == "Boolean"){
       formSchema["schema"][id]["properties"]["value"]["enum"] = ["true","false"]
     }
+    if (result["possibleValues"]){
+      formSchema["schema"][id]["properties"]["value"]["enum"] = Object.keys(result["possibleValues"])
+    }
 
 }
 
@@ -388,7 +391,6 @@ function trace_generate(all_request_data, callback) {
 
 function boolize(obj) {
     var map = Object.create(null);
-    map['true'] = true;
     map['false'] = false;
     // the recursive iterator
     function walker(obj) {
