@@ -1,6 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 
 $(document).ready(function() {
+  if($("#detailsTable")){
     $.ajax({
       url: decodeURIComponent(urlParams.get('v')),
       method: 'GET',
@@ -18,4 +19,5 @@ $(document).ready(function() {
         });
       }
     });
+  }
 });
